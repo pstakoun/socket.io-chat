@@ -1,2 +1,2 @@
 # SocketChat
-A simple web chat application using socket.io
+A simple web chat application using socket.io.
