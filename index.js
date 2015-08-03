@@ -7,11 +7,24 @@ var io = require('socket.io')(http);
 	res.sendFile(__dirname + '/public/index.html');
 });*/
 
+//Users in the chat room
+var usernames = {};
+var users = 0;
+
 app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
+  });
+  
+  socket.on('add user', function(username){
+	 // we store the username in the socket session for this client
+    socket.username = username;
+    // add the client's username to the global list
+    usernames[username] = username;
+    ++users;
+    
   });
 });
 
