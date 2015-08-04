@@ -3,6 +3,8 @@ var $usernameInput;
 var $loginPage;
 var $chatPage;
 var socket;
+
+var username;
 $(document).ready(function(){
 		
 		$window = $(window);
@@ -11,11 +13,13 @@ $(document).ready(function(){
 		$chatPage = $('.chat.page'); //chat page
 		
 		 socket = io();
-		 //user enters a message
+		 //user enters a message by clicking Send
 		 $('form').submit(function(){
-			socket.emit('chat message', $('#m').val());
-			$('#m').val('');
+			sendMessage();
 			return false;
+			/*socket.emit('chat message', $('#m').val());
+			$('#m').val('');
+			return false;*/
 		 });
 		 //display the message
 		 socket.on('chat message', function(msg){
@@ -27,7 +31,11 @@ $(document).ready(function(){
 			
 			// When the client hits ENTER on their keyboard
 			if (event.which === 13) {
-			  setUsername();
+			  if(username){ //sends a message with Enter
+				sendMessage();
+			  } else{ //Login with username
+				setUsername();
+			  }
 			}
 		 });
 });
@@ -47,3 +55,17 @@ $(document).ready(function(){
       socket.emit('add user', username);
     }
   }
+  
+//Send a chat message
+function sendMessage(){
+	var message = $('#m').val();
+	
+	//if its a non empty message then send it
+	if(message){
+		socket.emit('chat message', message);
+		$('#m').val(''); //set the input to empty
+	}
+}
+
+
+
