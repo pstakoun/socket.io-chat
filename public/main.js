@@ -4,6 +4,7 @@ var $loginPage;
 var $chatPage;
 var socket;
 
+var connected = false;
 var username;
 $(document).ready(function(){
 		
@@ -23,10 +24,25 @@ $(document).ready(function(){
 		 });
 		 //display the message
 		 socket.on('chat message', function(msg){
-			$('#messages').append($('<li>').text(msg));
+			log(msg);
 		 });
+		 
+		 // Whenever the server emits 'login', log the login message
+		  socket.on('login', function (data) {
+			connected = true;
+			// Display the welcome message
+			var message = "Welcome to Socket.IO Chat – ";
+			log(message);
+			log("there are " + data.users + " participants");
+			//addParticipantsMessage(data);
+		  });
+		  
+		  //server displays user joined
+		  socket.on('user joined', function (data) {
+			log(data.username + ' joined');
+		  });
+		  
 		 // Keyboard events
-
 		 $window.keydown(function (event) {
 			
 			// When the client hits ENTER on their keyboard
@@ -39,6 +55,10 @@ $(document).ready(function(){
 			}
 		 });
 });
+
+function log(message){
+	$('#messages').append($('<li>').text(message));
+}
 
 // Sets the client's username
   function setUsername () {
@@ -56,12 +76,12 @@ $(document).ready(function(){
     }
   }
   
-//Send a chat message
+//Send a chat message from the user's input box
 function sendMessage(){
 	var message = $('#m').val();
 	
-	//if its a non empty message then send it
-	if(message){
+	//if its a non empty message and the user is connected then send it
+	if(message && connected){
 		socket.emit('chat message', message);
 		$('#m').val(''); //set the input to empty
 	}
